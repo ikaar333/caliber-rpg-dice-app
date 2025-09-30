@@ -33,12 +33,35 @@ def lancer_de(delta, m):
 st.set_page_config(page_title="🎲 Lanceur de dés RPG", page_icon="🎲", layout="centered")
 st.title("🎲 Lanceur de dés RPG (D20 + Dé d'aléa)")
 
+# Info sur les bornes des paramètres
+st.info(
+    """
+    ℹ️ **Règles des paramètres :**
+    - **Écart de niveau (Δ)** : entre **-10** et **+10** (incluant 0).  
+    - **Variable (m)** : valeurs possibles **-4, -3, -2, -1, 0, 1, 2, 3, 4**.  
+    """
+)
+
+# Rappel de lecture des résultats
+st.markdown(
+    """
+    ### 📝 Guide de lecture des résultats :
+    - **Réussite [R]** → Oui  
+    - **Échec [E]** → Non  
+    - **Réussite améliorée [R+]** → Oui, et...  
+    - **Réussite affaiblie [R-]** → Oui, mais...  
+    - **Échec atténué [E+]** → Non, mais...  
+    - **Échec aggravé [E-]** → Non, et...  
+    """,
+    unsafe_allow_html=True
+)
+
 # Entrées utilisateur
 col1, col2, col3 = st.columns(3)
 with col1:
     delta = st.number_input("Écart de niveau (Δ)", min_value=-10, max_value=10, value=0)
 with col2:
-    m = st.number_input("Variable (m)", min_value=-10, max_value=10, value=0)
+    m = st.selectbox("Variable (m)", options=[-4, -3, -2, -1, 0, 1, 2, 3, 4], index=4)
 with col3:
     n_lancers = st.number_input("Nombre de lancers", min_value=1, max_value=50, value=1)
 
@@ -56,19 +79,16 @@ if st.button("🎲 Lancer les dés !"):
             "Résultat final": final_result_val
         })
 
-    # Transformer en DataFrame
     df = pd.DataFrame(résultats)
 
-    # Coloration conditionnelle
+    # Coloration réussites/échecs
     def color_result(val):
         if "Réussite" in val:
-            return "background-color: #c6f6d5"  # vert clair
+            return "background-color: #c6f6d5"
         elif "Échec" in val:
-            return "background-color: #fed7d7"  # rouge clair
+            return "background-color: #fed7d7"
         return ""
 
     styled_df = df.style.applymap(color_result, subset=["Résultat final"])
-
-    # Affichage
     st.subheader("📊 Résultats")
     st.dataframe(styled_df, use_container_width=True)
